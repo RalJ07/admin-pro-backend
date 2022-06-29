@@ -90,10 +90,6 @@ const retornaImagen = (req, res = response) => {
         res.sendFile( pathImg );
     }
 
-    
-
-    
-
 
 }
 
