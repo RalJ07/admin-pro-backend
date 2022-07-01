@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 
 const Usuario = require('../models/usuario');
-const { generearJWT } = require("../helpers/jwt");
+const { generarJWT } = require("../helpers/jwt");
 const { googleVerify } = require("../helpers/google-verify");
 
 const login = async(req, res = response) => {
@@ -35,7 +35,7 @@ const login = async(req, res = response) => {
         }
 
         //Generar el TOKEN - JWT
-        const token = await generearJWT( usuarioDB.id );
+        const token = await generarJWT( usuarioDB.id );
 
 
         res.json({
@@ -60,10 +60,10 @@ const googleSignIn = async( req, res = response ) => {
         const { email, name, picture } = await googleVerify( req.body.token );
 
         const usuarioDB = await Usuario.findOne({ email });
-        let usuario;
+        let Usuario;
 
         if ( !usuarioDB ) {
-            usuario = new Usuario({
+            Usuario = new Usuario({
                 nombre: name,
                 email,
                 password: '@@@',
@@ -71,16 +71,16 @@ const googleSignIn = async( req, res = response ) => {
                 google: true
             })
         } else {
-            usuario = usuarioDB;
-            usuario.google = true;
+            Usuario = usuarioDB;
+            Usuario.google = true;
             // usuario.password = '@@';
         }
 
         // Guardar Usuario
-        await usuario.save();
+        await Usuario.save();
 
         // Generar el TOKEN - JWT
-        const token = await generarJWT( usuario.id );
+        const token = await generarJWT( Usuario.id );
 
 
         res.json({
@@ -101,7 +101,23 @@ const googleSignIn = async( req, res = response ) => {
 
 }
 
+
+const renewToken = async (req, res= response) => {
+    const uid = req.uid;
+
+    // Generar el TOKEN - JWT
+    const token = await generarJWT( Usuario.id );
+    
+    res.json({
+        ok: true,
+        token
+
+    })
+
+
+}
 module.exports= {
     login,
-    googleSignIn
+    googleSignIn,
+    renewToken
 }
